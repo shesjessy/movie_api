@@ -4,6 +4,30 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Movie API Documentation</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            table,
+            th,
+            td {
+                border: 1px solid #ddd;
+            }
+            th,
+            td {
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #f4f4f4;
+            }
+        </style>
     </head>
     <body>
         <h1>Movie API Documentation</h1>
@@ -11,5 +35,161 @@
             This API provides access to information about movies, including
             details such as title, genre, release date, and more.
         </p>
+
+        <h2>API Endpoints</h2>
+        <table>
+            <tr>
+                <th>Request</th>
+                <th>URL</th>
+                <th>Response</th>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/movies</td>
+                <td>
+                    <strong>Method:</strong> GET<br />
+                    <strong>URL:</strong> /movies<br />
+                    <strong>Description:</strong> Returns a list of all movies
+                    available in the database.<br />
+                    <strong>Query Parameters:</strong> None<br />
+                    <strong>Request Body Format:</strong> None<br />
+                    <strong>Response Data Format:</strong> JSON - An array of
+                    movie objects, each containing details such as title, genre,
+                    director, and release date.
+                </td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/movies/:title</td>
+                <td>
+                    <strong>Method:</strong> GET<br />
+                    <strong>URL:</strong> /movies/:title<br />
+                    <strong>Description:</strong> Returns detailed information
+                    about a single movie by its title. This includes the movie's
+                    description, genre, director, image URL, and whether it is
+                    featured.<br />
+                    <strong>Query Parameters:</strong> `:title` - The title of
+                    the movie.<br />
+                    <strong>Request Body Format:</strong> None<br />
+                    <strong>Response Data Format:</strong> JSON - An object
+                    containing details about the specified movie.
+                </td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/genres/:name</td>
+                <td>
+                    <strong>Method:</strong> GET<br />
+                    <strong>URL:</strong> /genres/:name<br />
+                    <strong>Description:</strong> Returns data about a specific
+                    genre by its name. This includes the genre's description.<br />
+                    <strong>Query Parameters:</strong> `:name` - The name of the
+                    genre (e.g., "Thriller").<br />
+                    <strong>Request Body Format:</strong> None<br />
+                    <strong>Response Data Format:</strong> JSON - An object
+                    containing details about the specified genre.
+                </td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/directors/:name</td>
+                <td>
+                    <strong>Method:</strong> GET<br />
+                    <strong>URL:</strong> /directors/:name<br />
+                    <strong>Description:</strong> Returns biographical data
+                    about a director by their name. This includes the director's
+                    biography, birth year, and death year (if applicable).<br />
+                    <strong>Query Parameters:</strong> `:name` - The name of the
+                    director.<br />
+                    <strong>Request Body Format:</strong> None<br />
+                    <strong>Response Data Format:</strong> JSON - An object
+                    containing biographical details about the specified
+                    director.
+                </td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td>/users</td>
+                <td>
+                    <strong>Method:</strong> POST<br />
+                    <strong>URL:</strong> /users<br />
+                    <strong>Description:</strong> Allows new users to register
+                    by providing necessary user information.<br />
+                    <strong>Query Parameters:</strong> None<br />
+                    <strong>Request Body Format:</strong> JSON - User details
+                    such as username, password, email, and birthday.<br />
+                    <strong>Response Data Format:</strong> JSON - A confirmation
+                    message indicating successful registration.
+                </td>
+            </tr>
+            <tr>
+                <td>PUT</td>
+                <td>/users/:username</td>
+                <td>
+                    <strong>Method:</strong> PUT<br />
+                    <strong>URL:</strong> /users/:username<br />
+                    <strong>Description:</strong> Allows existing users to
+                    update their user information, such as their username.<br />
+                    <strong>Query Parameters:</strong> `:username` - The
+                    username of the user.<br />
+                    <strong>Request Body Format:</strong> JSON - Updated user
+                    details such as username, email, and password.<br />
+                    <strong>Response Data Format:</strong> JSON - A confirmation
+                    message indicating successful update of user information.
+                </td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td>/users/:username/movies/:movieID</td>
+                <td>
+                    <strong>Method:</strong> POST<br />
+                    <strong>URL:</strong> /users/:username/movies/:movieID<br />
+                    <strong>Description:</strong> Allows users to add a movie to
+                    their list of favorite movies. Returns a confirmation
+                    message upon successful addition.<br />
+                    <strong>Query Parameters:</strong> `:username` - The
+                    username of the user.<br />
+                    `:movieID` - The ID of the movie.<br />
+                    <strong>Request Body Format:</strong> None<br />
+                    <strong>Response Data Format:</strong> JSON - A confirmation
+                    message indicating successful addition of the movie to the
+                    user's favorites.
+                </td>
+            </tr>
+            <tr>
+                <td>DELETE</td>
+                <td>/users/:username/movies/:movieID</td>
+                <td>
+                    <strong>Method:</strong> DELETE<br />
+                    <strong>URL:</strong> /users/:username/movies/:movieID<br />
+                    <strong>Description:</strong> Allows users to remove a movie
+                    from their list of favorite movies. Returns a confirmation
+                    message upon successful removal.<br />
+                    <strong>Query Parameters:</strong> `:username` - The
+                    username of the user.<br />
+                    `:movieID` - The ID of the movie.<br />
+                    <strong>Request Body Format:</strong> None<br />
+                    <strong>Response Data Format:</strong> JSON - A confirmation
+                    message indicating successful removal of the movie from the
+                    user's favorites.
+                </td>
+            </tr>
+            <tr>
+                <td>DELETE</td>
+                <td>/users/:username</td>
+                <td>
+                    <strong>Method:</strong> DELETE<br />
+                    <strong>URL:</strong> /users/:username<br />
+                    <strong>Description:</strong> Allows existing users to
+                    deregister from the service. Returns a confirmation message
+                    upon successful deregistration.<br />
+                    <strong>Query Parameters:</strong> `:username` - The
+                    username of the user.<br />
+                    <strong>Request Body Format:</strong> None<br />
+                    <strong>Response Data Format:</strong> JSON - A confirmation
+                    message indicating successful deregistration of the user.
+                </td>
+            </tr>
+        </table>
     </body>
 </html>
