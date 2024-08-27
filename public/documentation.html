@@ -27,13 +27,20 @@
             th {
                 background-color: #f4f4f4;
             }
+            pre {
+                background-color: #f4f4f4;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                white-space: pre-wrap;
+            }
         </style>
     </head>
     <body>
         <h1>Movie API Documentation</h1>
         <p>
             This API provides access to information about movies, including
-            details such as title, genre, release date, and more.
+            details such as title, genre, director, and more.
         </p>
 
         <h2>API Endpoints</h2>
@@ -55,7 +62,29 @@
                     <strong>Request Body Format:</strong> None<br />
                     <strong>Response Data Format:</strong> JSON - An array of
                     movie objects, each containing details such as title, genre,
-                    director, and release date.
+                    director, and description.
+                    <br />
+                    <strong>Example Response:</strong>
+                    <pre>
+[
+{
+    "_id": "60d0fe4f5311236168a109ca",
+    "Title": "Inception",
+    "Description": "A thief who steals corporate secrets through use of dream-sharing technology is given the inverse task of planting an idea into the mind of a CEO.",
+    "Genre": {
+    "Name": "Sci-Fi",
+    "Description": "Science Fiction is a genre that uses speculative, fictional science-based depictions of phenomena that are not fully accepted by mainstream science."
+    },
+    "Director": {
+    "Name": "Christopher Nolan",
+    "Bio": "Christopher Nolan is a British-American film director, producer, and screenwriter."
+    },
+    "Actors": ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Elliot Page"],
+    "ImagePath": "/path/to/image.jpg",
+    "Featured": true
+}
+]
+                    </pre>
                 </td>
             </tr>
             <tr>
@@ -73,6 +102,26 @@
                     <strong>Request Body Format:</strong> None<br />
                     <strong>Response Data Format:</strong> JSON - An object
                     containing details about the specified movie.
+                    <br />
+                    <strong>Example Response:</strong>
+                    <pre>
+{
+"_id": "60d0fe4f5311236168a109ca",
+"Title": "Inception",
+"Description": "A thief who steals corporate secrets through use of dream-sharing technology is given the inverse task of planting an idea into the mind of a CEO.",
+"Genre": {
+    "Name": "Sci-Fi",
+    "Description": "Science Fiction is a genre that uses speculative, fictional science-based depictions of phenomena that are not fully accepted by mainstream science."
+},
+"Director": {
+    "Name": "Christopher Nolan",
+    "Bio": "Christopher Nolan is a British-American film director, producer, and screenwriter."
+},
+"Actors": ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Elliot Page"],
+"ImagePath": "/path/to/image.jpg",
+"Featured": true
+}
+                    </pre>
                 </td>
             </tr>
             <tr>
@@ -88,6 +137,14 @@
                     <strong>Request Body Format:</strong> None<br />
                     <strong>Response Data Format:</strong> JSON - An object
                     containing details about the specified genre.
+                    <br />
+                    <strong>Example Response:</strong>
+                    <pre>
+{
+"Name": "Sci-Fi",
+"Description": "Science Fiction is a genre that uses speculative, fictional science-based depictions of phenomena that are not fully accepted by mainstream science."
+}
+                    </pre>
                 </td>
             </tr>
             <tr>
@@ -105,6 +162,16 @@
                     <strong>Response Data Format:</strong> JSON - An object
                     containing biographical details about the specified
                     director.
+                    <br />
+                    <strong>Example Response:</strong>
+                    <pre>
+{
+"Name": "Christopher Nolan",
+"Bio": "Christopher Nolan is a British-American film director, producer, and screenwriter.",
+"BirthYear": "1970",
+"DeathYear": null
+}
+                    </pre>
                 </td>
             </tr>
             <tr>
@@ -117,9 +184,30 @@
                     by providing necessary user information.<br />
                     <strong>Query Parameters:</strong> None<br />
                     <strong>Request Body Format:</strong> JSON - User details
-                    such as username, password, email, and birthday.<br />
+                    such as username, password, email, and birthday.
+                    <br />
+                    <strong>Example Request Body:</strong>
+                    <pre>
+{
+"Username": "johndoe",
+"Password": "password123",
+"Email": "johndoe@example.com",
+"Birthday": "1990-01-01"
+}
+                    </pre>
                     <strong>Response Data Format:</strong> JSON - A confirmation
                     message indicating successful registration.
+                    <br />
+                    <strong>Example Response:</strong>
+                    <pre>
+{
+"_id": "60d0fe4f5311236168a109cb",
+"Username": "johndoe",
+"Email": "johndoe@example.com",
+"Birthday": "1990-01-01",
+"FavoriteMovies": []
+}
+                    </pre>
                 </td>
             </tr>
             <tr>
@@ -133,9 +221,30 @@
                     <strong>Query Parameters:</strong> `:username` - The
                     username of the user.<br />
                     <strong>Request Body Format:</strong> JSON - Updated user
-                    details such as username, email, and password.<br />
+                    details such as username, email, and password.
+                    <br />
+                    <strong>Example Request Body:</strong>
+                    <pre>
+{
+"Username": "john_updated",
+"Password": "newpassword123",
+"Email": "newemail@example.com",
+"Birthday": "1990-01-01"
+}
+                    </pre>
                     <strong>Response Data Format:</strong> JSON - A confirmation
                     message indicating successful update of user information.
+                    <br />
+                    <strong>Example Response:</strong>
+                    <pre>
+{
+"_id": "60d0fe4f5311236168a109cb",
+"Username": "john_updated",
+"Email": "newemail@example.com",
+"Birthday": "1990-01-01",
+"FavoriteMovies": []
+}
+                    </pre>
                 </td>
             </tr>
             <tr>
@@ -145,15 +254,31 @@
                     <strong>Method:</strong> POST<br />
                     <strong>URL:</strong> /users/:username/movies/:movieID<br />
                     <strong>Description:</strong> Allows users to add a movie to
-                    their list of favorite movies. Returns a confirmation
-                    message upon successful addition.<br />
+                    their list of favorite movies.
+                    <br />
                     <strong>Query Parameters:</strong> `:username` - The
                     username of the user.<br />
                     `:movieID` - The ID of the movie.<br />
                     <strong>Request Body Format:</strong> None<br />
-                    <strong>Response Data Format:</strong> JSON - A confirmation
-                    message indicating successful addition of the movie to the
-                    user's favorites.
+                    <strong>Response Data Format:</strong> JSON - The updated
+                    user object with the newly added movie in their favorites.
+                    <br />
+                    <strong>Example Response:</strong>
+                    <pre>
+{
+"_id": "60d0fe4f5311236168a109cb",
+"Username": "johndoe",
+"Email": "johndoe@example.com",
+"Birthday": "1990-01-01",
+"FavoriteMovies": [
+    {
+    "_id": "60d0fe4f5311236168a109ca",
+    "Title": "Inception",
+    "Description": "A thief who steals corporate secrets through use of dream-sharing technology is given the inverse task of planting an idea into the mind of a CEO."
+    }
+]
+}
+                    </pre>
                 </td>
             </tr>
             <tr>
@@ -163,15 +288,25 @@
                     <strong>Method:</strong> DELETE<br />
                     <strong>URL:</strong> /users/:username/movies/:movieID<br />
                     <strong>Description:</strong> Allows users to remove a movie
-                    from their list of favorite movies. Returns a confirmation
-                    message upon successful removal.<br />
+                    from their list of favorite movies.
+                    <br />
                     <strong>Query Parameters:</strong> `:username` - The
                     username of the user.<br />
                     `:movieID` - The ID of the movie.<br />
                     <strong>Request Body Format:</strong> None<br />
-                    <strong>Response Data Format:</strong> JSON - A confirmation
-                    message indicating successful removal of the movie from the
-                    user's favorites.
+                    <strong>Response Data Format:</strong> JSON - The updated
+                    user object with the movie removed from their favorites.
+                    <br />
+                    <strong>Example Response:</strong>
+                    <pre>
+{
+"_id": "60d0fe4f5311236168a109cb",
+"Username": "johndoe",
+"Email": "johndoe@example.com",
+"Birthday": "1990-01-01",
+"FavoriteMovies": []
+}
+                    </pre>
                 </td>
             </tr>
             <tr>
@@ -181,13 +316,20 @@
                     <strong>Method:</strong> DELETE<br />
                     <strong>URL:</strong> /users/:username<br />
                     <strong>Description:</strong> Allows existing users to
-                    deregister from the service. Returns a confirmation message
-                    upon successful deregistration.<br />
+                    deregister from the service.
+                    <br />
                     <strong>Query Parameters:</strong> `:username` - The
                     username of the user.<br />
                     <strong>Request Body Format:</strong> None<br />
                     <strong>Response Data Format:</strong> JSON - A confirmation
                     message indicating successful deregistration of the user.
+                    <br />
+                    <strong>Example Response:</strong>
+                    <pre>
+{
+"message": "User deregistered successfully"
+}
+                    </pre>
                 </td>
             </tr>
         </table>

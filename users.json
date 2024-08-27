@@ -1,0 +1,34 @@
+[
+    {
+        "_id": { "$oid": "66c797684efdb61c412710bd" },
+        "username": "jane_smith",
+        "email": "jane.smith@example.com",
+        "password": "hashedpassword2",
+        "birthday": { "$date": "1990-07-12T00:00:00Z" },
+        "favoriteMovies": ["The Shawshank Redemption", "Pulp Fiction"]
+    },
+    {
+        "_id": { "$oid": "66c797684efdb61c412710be" },
+        "username": "mike_jones",
+        "email": "mike.jones@example.com",
+        "password": "hashedpassword3",
+        "birthday": { "$date": "1983-11-03T00:00:00Z" },
+        "favoriteMovies": ["Interstellar", "Jurassic Park"]
+    },
+    {
+        "_id": { "$oid": "66c797684efdb61c412710bf" },
+        "username": "emily_brown",
+        "email": "emily.brown@example.com",
+        "password": "hashedpassword4",
+        "birthday": { "$date": "1995-05-25T00:00:00Z" },
+        "favoriteMovies": ["Schindler's List", "The Matrix"]
+    },
+    {
+        "_id": { "$oid": "66c797684efdb61c412710c0" },
+        "username": "sarah_connor",
+        "email": "sarah.connor@example.com",
+        "password": "hashedpassword5",
+        "birthday": { "$date": "1988-09-15T00:00:00Z" },
+        "favoriteMovies": ["The Godfather", "Kill Bill: Vol. 1"]
+    }
+]

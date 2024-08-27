@@ -1,138 +1,155 @@
-// Import the express module
 const express = require("express");
+const mongoose = require("mongoose");
+const Models = require("./models.js");
 
-// Import the morgan module
-const morgan = require("morgan");
+const Movies = Models.Movie;
+const Users = Models.User;
 
-// Create an instance of express
 const app = express();
-
-// Define a port to run the server on
-const PORT = process.env.PORT || 3000;
-
-// Use Morgan to log all requests
-app.use(morgan("common"));
 
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-// Serve static files from the 'public' directory
-app.use(express.static("public"));
+// Connect to MongoDB
+mongoose
+    .connect("mongodb://localhost:27017/moviedb", {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() => console.log("Connected to MongoDB successfully"))
+    .catch((err) => console.error("Could not connect to MongoDB:", err));
 
-// Define a route to get the top 10 movies
-app.get("/movies", (req, res) => {
-    // Define an array of top 10 movies
-    const topMovies = [
-        {
-            title: "The Shawshank Redemption",
-            year: 1994,
-            director: "Frank Darabont",
-        },
-        {
-            title: "The Godfather",
-            year: 1972,
-            director: "Francis Ford Coppola",
-        },
-        { title: "The Dark Knight", year: 2008, director: "Christopher Nolan" },
-        { title: "Pulp Fiction", year: 1994, director: "Quentin Tarantino" },
-        { title: "Schindler's List", year: 1993, director: "Steven Spielberg" },
-        {
-            title: "The Lord of the Rings: The Return of the King",
-            year: 2003,
-            director: "Peter Jackson",
-        },
-        { title: "Forrest Gump", year: 1994, director: "Robert Zemeckis" },
-        { title: "Inception", year: 2010, director: "Christopher Nolan" },
-        { title: "Fight Club", year: 1999, director: "David Fincher" },
-        {
-            title: "The Matrix",
-            year: 1999,
-            director: "Lana Wachowski, Lilly Wachowski",
-        },
-    ];
+// Routes
 
-    // Send the array as a JSON response
-    res.json(topMovies);
+// Get all movies
+app.get("/movies", async (req, res) => {
+    try {
+        const movies = await Movies.find();
+        res.json(movies);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
-// Define a route to handle the root URL
-app.get("/", (req, res) => {
-    res.send("Welcome to My Movie API!");
+// Get a single movie by ID
+app.get("/movies/:id", async (req, res) => {
+    try {
+        const movie = await Movies.findById(req.params.id);
+        if (!movie) return res.status(404).json({ message: "Movie not found" });
+        res.json(movie);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
-// Additional Routes
-
-// Return data about a single movie by title to the user
-app.get("/movies/:title", (req, res) => {
-    const title = req.params.title;
-    res.send(
-        `Successful GET request returning data about the movie titled: ${title}`
-    );
+// Create a new movie
+app.post("/movies", async (req, res) => {
+    const movie = new Movies(req.body);
+    try {
+        const newMovie = await movie.save();
+        res.status(201).json(newMovie);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
 });
 
-// Return data about a genre by name/title
-app.get("/genres/:name", (req, res) => {
-    const genreName = req.params.name;
-    res.send(
-        `Successful GET request returning data about the genre: ${genreName}`
-    );
+// Update an existing movie
+app.put("/movies/:id", async (req, res) => {
+    try {
+        const updatedMovie = await Movies.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        );
+        if (!updatedMovie)
+            return res.status(404).json({ message: "Movie not found" });
+        res.json(updatedMovie);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
 });
 
-// Return data about a director by name
-app.get("/directors/:name", (req, res) => {
-    const directorName = req.params.name;
-    res.send(
-        `Successful GET request returning data about the director: ${directorName}`
-    );
+// Delete a movie
+app.delete("/movies/:id", async (req, res) => {
+    try {
+        const deletedMovie = await Movies.findByIdAndDelete(req.params.id);
+        if (!deletedMovie)
+            return res.status(404).json({ message: "Movie not found" });
+        res.json({ message: "Movie deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
-// Allow new users to register
-app.post("/users", (req, res) => {
-    res.send("POST request to register a new user");
+// User registration
+app.post("/users", async (req, res) => {
+    const user = new Users(req.body);
+    try {
+        const newUser = await user.save();
+        res.status(201).json(newUser);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
 });
 
-// Allow users to update their user info (username)
-app.put("/users/:username", (req, res) => {
-    const username = req.params.username;
-    res.send(
-        `Successful PUT request to update user info for username: ${username}`
-    );
+// Get a user by username
+app.get("/users/:username", async (req, res) => {
+    try {
+        const user = await Users.findOne({
+            Username: req.params.username,
+        }).populate("FavoriteMovies");
+        if (!user) return res.status(404).json({ message: "User not found" });
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
-// Allow users to add a movie to their list of favorites
-app.post("/users/:username/movies/:movieID", (req, res) => {
-    const { username, movieID } = req.params;
-    res.send(
-        `Successful POST request to add movie with ID ${movieID} to ${username}'s list of favorites`
-    );
+// Add a movie to user's favorites
+app.post("/users/:username/movies/:movieId", async (req, res) => {
+    try {
+        const user = await Users.findOneAndUpdate(
+            { Username: req.params.username },
+            { $addToSet: { FavoriteMovies: req.params.movieId } },
+            { new: true }
+        ).populate("FavoriteMovies");
+        if (!user) return res.status(404).json({ message: "User not found" });
+        res.json(user);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
 });
 
-// Allow users to remove a movie from their list of favorites
-app.delete("/users/:username/movies/:movieID", (req, res) => {
-    const { username, movieID } = req.params;
-    res.send(
-        `Successful DELETE request to remove movie with ID ${movieID} from ${username}'s list of favorites`
-    );
+// Remove a movie from user's favorites
+app.delete("/users/:username/movies/:movieId", async (req, res) => {
+    try {
+        const user = await Users.findOneAndUpdate(
+            { Username: req.params.username },
+            { $pull: { FavoriteMovies: req.params.movieId } },
+            { new: true }
+        ).populate("FavoriteMovies");
+        if (!user) return res.status(404).json({ message: "User not found" });
+        res.json(user);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
 });
 
-// Allow existing users to deregister
-app.delete("/users/:username", (req, res) => {
-    const username = req.params.username;
-    res.send(
-        `Successful DELETE request to deregister user with username: ${username}`
-    );
-});
-
-// Error-handling middleware function
-app.use((err, req, res, next) => {
-    // Log the error details to the terminal
-    console.error(err.stack);
-
-    // Send a generic error response
-    res.status(500).send("Something went wrong! Please try again later.");
+// Delete a user
+app.delete("/users/:username", async (req, res) => {
+    try {
+        const user = await Users.findOneAndDelete({
+            Username: req.params.username,
+        });
+        if (!user) return res.status(404).json({ message: "User not found" });
+        res.json({ message: "User deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
 // Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });
