@@ -10,6 +10,25 @@ const app = express();
 // Middleware to parse JSON bodies
 app.use(express.json());
 
+let auth = require("./auth")(app);
+
+const passport = require("passport");
+require("./passport");
+
+// Protecting the /movies endpoint with JWT
+app.get(
+    "/movies",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        try {
+            const movies = await Movies.find();
+            res.json(movies);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    }
+);
+
 // Connect to MongoDB
 mongoose
     .connect("mongodb://localhost:27017/moviedb", {
