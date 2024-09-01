@@ -15,19 +15,18 @@ let auth = require("./auth")(app);
 const passport = require("passport");
 require("./passport");
 
+// Protecting all endpoints except for registration and login
+const authenticate = passport.authenticate("jwt", { session: false });
+
 // Protecting the /movies endpoint with JWT
-app.get(
-    "/movies",
-    passport.authenticate("jwt", { session: false }),
-    async (req, res) => {
-        try {
-            const movies = await Movies.find();
-            res.json(movies);
-        } catch (err) {
-            res.status(500).json({ message: err.message });
-        }
+app.get("/movies", authenticate, async (req, res) => {
+    try {
+        const movies = await Movies.find();
+        res.json(movies);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
-);
+});
 
 // Connect to MongoDB
 mongoose
@@ -40,18 +39,8 @@ mongoose
 
 // Routes
 
-// Get all movies
-app.get("/movies", async (req, res) => {
-    try {
-        const movies = await Movies.find();
-        res.json(movies);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
 // Get a single movie by ID
-app.get("/movies/:id", async (req, res) => {
+app.get("/movies/:id", authenticate, async (req, res) => {
     try {
         const movie = await Movies.findById(req.params.id);
         if (!movie) return res.status(404).json({ message: "Movie not found" });
@@ -62,7 +51,7 @@ app.get("/movies/:id", async (req, res) => {
 });
 
 // Create a new movie
-app.post("/movies", async (req, res) => {
+app.post("/movies", authenticate, async (req, res) => {
     const movie = new Movies(req.body);
     try {
         const newMovie = await movie.save();
@@ -73,7 +62,7 @@ app.post("/movies", async (req, res) => {
 });
 
 // Update an existing movie
-app.put("/movies/:id", async (req, res) => {
+app.put("/movies/:id", authenticate, async (req, res) => {
     try {
         const updatedMovie = await Movies.findByIdAndUpdate(
             req.params.id,
@@ -89,7 +78,7 @@ app.put("/movies/:id", async (req, res) => {
 });
 
 // Delete a movie
-app.delete("/movies/:id", async (req, res) => {
+app.delete("/movies/:id", authenticate, async (req, res) => {
     try {
         const deletedMovie = await Movies.findByIdAndDelete(req.params.id);
         if (!deletedMovie)
@@ -100,7 +89,7 @@ app.delete("/movies/:id", async (req, res) => {
     }
 });
 
-// User registration
+// User registration (no authentication)
 app.post("/users", async (req, res) => {
     const user = new Users(req.body);
     try {
@@ -112,7 +101,7 @@ app.post("/users", async (req, res) => {
 });
 
 // Get a user by username
-app.get("/users/:username", async (req, res) => {
+app.get("/users/:username", authenticate, async (req, res) => {
     try {
         const user = await Users.findOne({
             Username: req.params.username,
@@ -125,7 +114,7 @@ app.get("/users/:username", async (req, res) => {
 });
 
 // Add a movie to user's favorites
-app.post("/users/:username/movies/:movieId", async (req, res) => {
+app.post("/users/:username/movies/:movieId", authenticate, async (req, res) => {
     try {
         const user = await Users.findOneAndUpdate(
             { Username: req.params.username },
@@ -140,22 +129,27 @@ app.post("/users/:username/movies/:movieId", async (req, res) => {
 });
 
 // Remove a movie from user's favorites
-app.delete("/users/:username/movies/:movieId", async (req, res) => {
-    try {
-        const user = await Users.findOneAndUpdate(
-            { Username: req.params.username },
-            { $pull: { FavoriteMovies: req.params.movieId } },
-            { new: true }
-        ).populate("FavoriteMovies");
-        if (!user) return res.status(404).json({ message: "User not found" });
-        res.json(user);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
+app.delete(
+    "/users/:username/movies/:movieId",
+    authenticate,
+    async (req, res) => {
+        try {
+            const user = await Users.findOneAndUpdate(
+                { Username: req.params.username },
+                { $pull: { FavoriteMovies: req.params.movieId } },
+                { new: true }
+            ).populate("FavoriteMovies");
+            if (!user)
+                return res.status(404).json({ message: "User not found" });
+            res.json(user);
+        } catch (err) {
+            res.status(400).json({ message: err.message });
+        }
     }
-});
+);
 
 // Delete a user
-app.delete("/users/:username", async (req, res) => {
+app.delete("/users/:username", authenticate, async (req, res) => {
     try {
         const user = await Users.findOneAndDelete({
             Username: req.params.username,
