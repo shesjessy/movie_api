@@ -7,6 +7,9 @@ const Users = Models.User;
 
 const app = express();
 
+const cors = require("cors");
+app.use(cors());
+
 // Middleware to parse JSON bodies
 app.use(express.json());
 
@@ -91,13 +94,34 @@ app.delete("/movies/:id", authenticate, async (req, res) => {
 
 // User registration (no authentication)
 app.post("/users", async (req, res) => {
-    const user = new Users(req.body);
-    try {
-        const newUser = await user.save();
-        res.status(201).json(newUser);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
+    let hashedPassword = Users.hashPassword(req.body.Password);
+    await Users.findOne({ Username: req.body.Username }) // Search to see if a user with the requested username already exists
+        .then((user) => {
+            if (user) {
+                //If the user is found, send a response that it already exists
+                return res
+                    .status(400)
+                    .send(req.body.Username + " already exists");
+            } else {
+                Users.create({
+                    Username: req.body.Username,
+                    Password: hashedPassword,
+                    Email: req.body.Email,
+                    Birthday: req.body.Birthday,
+                })
+                    .then((user) => {
+                        res.status(201).json(user);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        res.status(500).send("Error: " + error);
+                    });
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send("Error: " + error);
+        });
 });
 
 // Get a user by username

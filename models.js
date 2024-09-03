@@ -1,25 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-let movieSchema = mongoose.Schema(
-    {
-        Title: { type: String, required: true },
-        Description: { type: String, required: true },
-        Genre: {
-            Name: { type: String, required: true },
-            Description: { type: String, required: true },
-        },
-        Director: {
-            Name: { type: String, required: true },
-            Bio: String,
-        },
-        Actors: [String],
-        ImagePath: String,
-        Featured: { type: Boolean, default: false },
-    },
-    { timestamps: true }
-); // Adds createdAt and updatedAt fields
-
 let userSchema = mongoose.Schema(
     {
         Username: { type: String, required: true, unique: true, minLength: 5 },
@@ -38,17 +19,25 @@ let userSchema = mongoose.Schema(
     { timestamps: true }
 );
 
-// Hash the user's password before saving
+// Static method to hash passwords
+userSchema.statics.hashPassword = (password) => {
+    return bcrypt.hashSync(password, 10);
+};
+
+// Instance method to validate passwords
+userSchema.methods.validatePassword = function (password) {
+    console.log(`Comparing: ${password} with stored hash: ${this.Password}`);
+    return bcrypt.compareSync(password, this.Password);
+};
+
+// Middleware to hash the password before saving
 userSchema.pre("save", async function (next) {
     if (this.isModified("Password") || this.isNew) {
-        const salt = await bcrypt.genSalt(10);
-        this.Password = await bcrypt.hash(this.Password, salt);
+        this.Password = await this.constructor.hashPassword(this.Password);
     }
     next();
 });
 
-let Movie = mongoose.model("Movie", movieSchema);
 let User = mongoose.model("User", userSchema);
 
-module.exports.Movie = Movie;
 module.exports.User = User;
