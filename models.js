@@ -30,14 +30,6 @@ userSchema.methods.validatePassword = function (password) {
     return bcrypt.compareSync(password, this.Password);
 };
 
-// Middleware to hash the password before saving
-userSchema.pre("save", async function (next) {
-    if (this.isModified("Password") || this.isNew) {
-        this.Password = await this.constructor.hashPassword(this.Password);
-    }
-    next();
-});
-
 let User = mongoose.model("User", userSchema);
 
 module.exports.User = User;
