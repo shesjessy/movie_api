@@ -24,13 +24,15 @@ require("./passport");
 const authenticate = passport.authenticate("jwt", { session: false });
 
 // Connect to MongoDB
-mongoose
-    .connect("mongodb://localhost:27017/moviedb", {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
-    .then(() => console.log("Connected to MongoDB successfully"))
-    .catch((err) => console.error("Could not connect to MongoDB:", err));
+// mongoose.connect("mongodb://localhost:27017/moviedb", {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+// });
+
+mongoose.connect(process.env.CONNECTION_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
 
 // ROUTES
 
@@ -142,7 +144,7 @@ app.post(
 );
 
 // 6. Update user info (username, password, email, date of birth) by user ID
-//with validation
+// with validation
 app.put(
     "/users/:id",
     authenticate,
