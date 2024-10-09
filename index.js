@@ -29,10 +29,7 @@ const authenticate = passport.authenticate("jwt", { session: false });
 //     useUnifiedTopology: true,
 // });
 
-mongoose.connect(process.env.CONNECTION_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
+mongoose.connect(process.env.CONNECTION_URI);
 
 // ROUTES
 
@@ -247,6 +244,12 @@ app.delete("/users/:username", authenticate, async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
+});
+
+app.get("/", (req, res) => {
+    res.send(
+        "Welcome to the Movie API! Use the /movies endpoint to get started."
+    );
 });
 
 // Server startup
