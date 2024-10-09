@@ -24,9 +24,7 @@ require("./passport");
 const authenticate = passport.authenticate("jwt", { session: false });
 
 // Connect to MongoDB
-// mongoose.connect("mongodb://localhost:27017/moviedb", {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
+// mongoose.connect("mongodb://localhost:27017/moviedb",
 // });
 
 mongoose.connect(process.env.CONNECTION_URI);
